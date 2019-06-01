@@ -8,14 +8,15 @@ import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 public class TriggerCollection implements InvocationHandler {
-    private static TriggeredCollectionBuilder builder;
+    private static TriggerCollectionBuilder builder;
 
-    protected TriggerCollection() {}
+    protected TriggerCollection() {
+    }
 
     @SuppressWarnings("unchecked")
-    public static <T> TriggeredCollectionBuilder<T> from(Collection<T> backedList) {
-        builder = new TriggeredCollectionBuilder<>(backedList);
-        return (TriggeredCollectionBuilder<T>) builder;
+    public static <T> TriggerCollectionBuilder<T> from(Collection<T> backedList) {
+        builder = new TriggerCollectionBuilder<>(backedList);
+        return (TriggerCollectionBuilder<T>) builder;
     }
 
     @Override
@@ -30,26 +31,26 @@ public class TriggerCollection implements InvocationHandler {
         return method.invoke(builder.backedCollection, args);
     }
 
-    static class TriggeredCollectionBuilder<T> {
+    static class TriggerCollectionBuilder<T> {
 
         private Collection<T> backedCollection;
 
         private Consumer<T> beforeAdd = t -> {};
         private BiConsumer<T, Boolean> afterAdd = (t, b) -> {};
 
-        public TriggeredCollectionBuilder(Collection<T> backedCollection) {
+        public TriggerCollectionBuilder(Collection<T> backedCollection) {
             if (builder == null) {
                 builder = this;
             }
             this.backedCollection = backedCollection;
         }
 
-        public TriggeredCollectionBuilder<T> beforeAdd(Consumer<T> beforeAdd) {
+        public TriggerCollectionBuilder<T> beforeAdd(Consumer<T> beforeAdd) {
             this.beforeAdd = beforeAdd;
             return this;
         }
 
-        public TriggeredCollectionBuilder<T> afterAdd(BiConsumer<T, Boolean> afterAdd) {
+        public TriggerCollectionBuilder<T> afterAdd(BiConsumer<T, Boolean> afterAdd) {
             this.afterAdd = afterAdd;
             return this;
         }
