@@ -13,6 +13,14 @@ public class TriggerCollection implements InvocationHandler {
     protected TriggerCollection() {
     }
 
+    /**
+     * Create trigger builder that can be used for adding new triggers to collection.
+     * Use {@link TriggerCollectionBuilder#build()} to build trigger collection.
+     *
+     * @param backedList original collection
+     * @param <T>        type of original collection
+     * @return           {@link TriggerCollectionBuilder} to add triggers
+     */
     @SuppressWarnings("unchecked")
     public static <T> TriggerCollectionBuilder<T> from(Collection<T> backedList) {
         builder = new TriggerCollectionBuilder<>(backedList);
