@@ -39,28 +39,42 @@ public class TriggerList extends TriggerCollection {
         return super.invoke(proxy, method, args);
     }
 
-    static class TriggerListBuilder<T> extends TriggerCollectionBuilder<T> {
+    public static class TriggerListBuilder<T> extends TriggerCollectionBuilder<T> {
 
         private List<T> backedList;
 
         private Consumer<Integer> beforeGet = t -> {};
         private BiConsumer<Integer, T> afterGet = (i, t) -> {};
 
-        public TriggerListBuilder(List<T> backedList) {
+        private TriggerListBuilder(List<T> backedList) {
             super(backedList);
             this.backedList = backedList;
         }
 
+        /**
+         * Adds action that will be executed before {@link List#get(int)} method is called.
+         * @param beforeGet action with index of an element as a parameter
+         * @return builder
+         */
         public TriggerListBuilder<T> beforeGet(Consumer<Integer> beforeGet) {
             this.beforeGet = beforeGet;
             return this;
         }
 
+        /**
+         * Adds action that will be executed before {@link List#get(int)} method is called.
+         * @param afterGet action with index of an element as a parameter
+         * @return builder
+         */
         public TriggerListBuilder<T> afterGet(BiConsumer<Integer, T> afterGet) {
             this.afterGet = afterGet;
             return this;
         }
 
+        /**
+         * Creates a proxy instance.
+         * @return proxy instance for the {@link List}
+         */
         @SuppressWarnings("unchecked")
         public List<T> build() {
             return (List<T>) Proxy.newProxyInstance(
