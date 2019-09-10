@@ -39,16 +39,21 @@ public class TriggerList extends TriggerCollection {
         return super.invoke(proxy, method, args);
     }
 
-    public static class TriggerListBuilder<T> extends TriggerCollectionBuilder<T> {
+    public static class TriggerListBuilder<E> extends TriggerCollectionBuilder<E, TriggerListBuilder<E>> {
 
-        private List<T> backedList;
+        private List<E> backedList;
 
         private Consumer<Integer> beforeGet = t -> {};
-        private BiConsumer<Integer, T> afterGet = (i, t) -> {};
+        private BiConsumer<Integer, E> afterGet = (i, t) -> {};
 
-        private TriggerListBuilder(List<T> backedList) {
+        private TriggerListBuilder(List<E> backedList) {
             super(backedList);
             this.backedList = backedList;
+        }
+
+        @Override
+        protected TriggerListBuilder<E> self() {
+            return this;
         }
 
         /**
@@ -56,7 +61,7 @@ public class TriggerList extends TriggerCollection {
          * @param beforeGet action with index of an element as a parameter
          * @return builder
          */
-        public TriggerListBuilder<T> beforeGet(Consumer<Integer> beforeGet) {
+        public TriggerListBuilder<E> beforeGet(Consumer<Integer> beforeGet) {
             this.beforeGet = beforeGet;
             return this;
         }
@@ -66,7 +71,7 @@ public class TriggerList extends TriggerCollection {
          * @param afterGet action with index of an element as a parameter
          * @return builder
          */
-        public TriggerListBuilder<T> afterGet(BiConsumer<Integer, T> afterGet) {
+        public TriggerListBuilder<E> afterGet(BiConsumer<Integer, E> afterGet) {
             this.afterGet = afterGet;
             return this;
         }
@@ -76,8 +81,8 @@ public class TriggerList extends TriggerCollection {
          * @return proxy instance for the {@link List}
          */
         @SuppressWarnings("unchecked")
-        public List<T> build() {
-            return (List<T>) Proxy.newProxyInstance(
+        public List<E> build() {
+            return (List<E>) Proxy.newProxyInstance(
                     backedList.getClass().getClassLoader(),
                     new Class[]{List.class},
                     new TriggerList()

@@ -18,13 +18,16 @@ public class TriggerCollection implements InvocationHandler {
      * Use {@link TriggerCollectionBuilder#build()} to build trigger collection.
      *
      * @param backedList original collection
-     * @param <T>        type of original collection
+     * @param <E>        type of original collection
+     * @param <T>        TriggeredCollectionBuilder subclass
      * @return           {@link TriggerCollectionBuilder} to add triggers
      */
     @SuppressWarnings("unchecked")
-    public static <T> TriggerCollectionBuilder<T> from(Collection<T> backedList) {
+    public static <E, T extends TriggerCollectionBuilder<E, T>> TriggerCollectionBuilder<E, T> from(
+        Collection<E> backedList
+    ) {
         builder = new TriggerCollectionBuilder<>(backedList);
-        return (TriggerCollectionBuilder<T>) builder;
+        return (TriggerCollectionBuilder<E, T>) builder;
     }
 
     @Override
@@ -57,27 +60,32 @@ public class TriggerCollection implements InvocationHandler {
         return method.invoke(builder.backedCollection, args);
     }
 
-    public static class TriggerCollectionBuilder<T> {
+    public static class TriggerCollectionBuilder<E, T extends TriggerCollectionBuilder<E, T>> {
 
-        private Collection<T> backedCollection;
+        private Collection<E> backedCollection;
 
-        private Consumer<T> beforeAdd = valueToAdd -> {};
-        private BiConsumer<T, Boolean> afterAdd = (valueToAdd, result) -> {};
+        private Consumer<E> beforeAdd = valueToAdd -> {};
+        private BiConsumer<E, Boolean> afterAdd = (valueToAdd, result) -> {};
 
-        private Consumer<Collection<T>> beforeAddAll = valueToAdd -> {};
-        private BiConsumer<Collection<T>, Boolean> afterAddAll = (valueToAdd, result) -> {};
+        private Consumer<Collection<E>> beforeAddAll = valueToAdd -> {};
+        private BiConsumer<Collection<E>, Boolean> afterAddAll = (valueToAdd, result) -> {};
 
-        private Consumer<T> beforeRemove = valueToRemove -> {};
-        private BiConsumer<T, Boolean> afterRemove = (valueToRemove, result) -> {};
+        private Consumer<E> beforeRemove = valueToRemove -> {};
+        private BiConsumer<E, Boolean> afterRemove = (valueToRemove, result) -> {};
 
-        private Consumer<Collection<T>> beforeRemoveAll = valueToRemove -> {};
-        private BiConsumer<Collection<T>, Boolean> afterRemoveAll = (valueToRemove, result) -> {};
+        private Consumer<Collection<E>> beforeRemoveAll = valueToRemove -> {};
+        private BiConsumer<Collection<E>, Boolean> afterRemoveAll = (valueToRemove, result) -> {};
 
-        TriggerCollectionBuilder(Collection<T> backedCollection) {
+        TriggerCollectionBuilder(Collection<E> backedCollection) {
             if (builder == null) {
                 builder = this;
             }
             this.backedCollection = backedCollection;
+        }
+
+        @SuppressWarnings("unchecked")
+        protected T self() {
+            return (T)this;
         }
 
         /**
@@ -85,9 +93,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeAdd action with element to be added as a parameter
          * @return builder
          */
-        public TriggerCollectionBuilder<T> beforeAdd(Consumer<T> beforeAdd) {
+        public T beforeAdd(Consumer<E> beforeAdd) {
             this.beforeAdd = beforeAdd;
-            return this;
+            return self();
         }
 
         /**
@@ -95,9 +103,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterAdd action with element to be added and result as parameters
          * @return builder
          */
-        public TriggerCollectionBuilder<T> afterAdd(BiConsumer<T, Boolean> afterAdd) {
+        public T afterAdd(BiConsumer<E, Boolean> afterAdd) {
             this.afterAdd = afterAdd;
-            return this;
+            return self();
         }
 
         /**
@@ -105,9 +113,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeAddAll action with collection of elements to be added as a parameter
          * @return builder
          */
-        public TriggerCollectionBuilder<T> beforeAddAll(Consumer<Collection<T>> beforeAddAll) {
+        public T beforeAddAll(Consumer<Collection<E>> beforeAddAll) {
             this.beforeAddAll = beforeAddAll;
-            return this;
+            return self();
         }
 
         /**
@@ -115,9 +123,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterAddAll action with collection of elements to be added and result as parameters
          * @return builder
          */
-        public TriggerCollectionBuilder<T> afterAddAll(BiConsumer<Collection<T>, Boolean> afterAddAll) {
+        public T afterAddAll(BiConsumer<Collection<E>, Boolean> afterAddAll) {
             this.afterAddAll = afterAddAll;
-            return this;
+            return self();
         }
 
         /**
@@ -125,9 +133,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeRemove action with element to be removed as a parameter
          * @return builder
          */
-        public TriggerCollectionBuilder<T> beforeRemove(Consumer<T> beforeRemove) {
+        public T beforeRemove(Consumer<E> beforeRemove) {
             this.beforeRemove = beforeRemove;
-            return this;
+            return self();
         }
 
         /**
@@ -135,9 +143,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterRemove action with element to be removed and result as parameters
          * @return builder
          */
-        public TriggerCollectionBuilder<T> afterRemove(BiConsumer<T, Boolean> afterRemove) {
+        public T afterRemove(BiConsumer<E, Boolean> afterRemove) {
             this.afterRemove = afterRemove;
-            return this;
+            return self();
         }
 
 
@@ -146,9 +154,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeRemoveAll action with collection of elements to be removed as a parameter
          * @return builder
          */
-        public TriggerCollectionBuilder<T> beforeRemoveAll(Consumer<Collection<T>> beforeRemoveAll) {
+        public T beforeRemoveAll(Consumer<Collection<E>> beforeRemoveAll) {
             this.beforeRemoveAll = beforeRemoveAll;
-            return this;
+            return self();
         }
 
         /**
@@ -156,9 +164,9 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterRemoveAll action with collection of elements to be removed and result as parameters
          * @return builder
          */
-        public TriggerCollectionBuilder<T> afterRemoveAll(BiConsumer<Collection<T>, Boolean> afterRemoveAll) {
+        public T afterRemoveAll(BiConsumer<Collection<E>, Boolean> afterRemoveAll) {
             this.afterRemoveAll = afterRemoveAll;
-            return this;
+            return self();
         }
 
         /**
@@ -166,8 +174,8 @@ public class TriggerCollection implements InvocationHandler {
          * @return proxy instance for the {@link Collection}
          */
         @SuppressWarnings("unchecked")
-        public Collection<T> build() {
-            return (Collection<T>) Proxy.newProxyInstance(
+        public Collection<E> build() {
+            return (Collection<E>) Proxy.newProxyInstance(
                     backedCollection.getClass().getClassLoader(),
                     backedCollection.getClass().getInterfaces(),
                     new TriggerCollection()
