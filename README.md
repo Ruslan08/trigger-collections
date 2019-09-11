@@ -11,21 +11,19 @@ Wrapper for some of standard Java collections with ability to add triggers that 
 1. Build project with `mvn clean package`
 2. Add jar file to your project
 
-## Logging
-The most commonly use case is logging:
+## Keep track of collection modifying
+
 ```java
 List<Integer> sourceList = new ArrayList<>();
 
 List<Integer> list = TriggerList.from(sourceList)
-        .afterRemove((i, b) -> System.out.println(i + (b ? " removed" : " is not removed")))
+        .beforeAdd(valueToAdd -> someAction(valueToAdd))
+        .afterRemove((valueToAdd, res) -> res ? doSmth() : doSmthElse())
         .build();
 
-list.add(1);
-list.add(5);
-list.remove(3);
+list.add(1);    // someAction(1) is called
+list.add(5);    // someAction(5) is called
+list.remove(3); // doSmthElse() is called
 ```
-> 1 is adding</br>
-> 5 is adding</br>
-> 3 is not removed
 
 ...
