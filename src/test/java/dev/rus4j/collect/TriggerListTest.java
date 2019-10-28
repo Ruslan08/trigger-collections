@@ -5,10 +5,12 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 
 public class TriggerListTest {
     private static final int VALUE_TO_GET = 7;
@@ -46,5 +48,19 @@ public class TriggerListTest {
 
         @SuppressWarnings("unused")
         Integer integer = triggeredList.get(0);
+    }
+
+    @Test
+    public void testMethodFromCollection() {
+        AtomicBoolean invoked = new AtomicBoolean(false);
+        final Consumer<Integer> integerConsumer = newValue -> {
+            invoked.set(true);
+            assertEquals(Integer.valueOf(15), newValue);
+        };
+        List<Integer> triggerList = TriggerList.from(this.list)
+            .beforeAdd(integerConsumer)
+            .build();
+        triggerList.add(15);
+        assertTrue(invoked.get());
     }
 }
