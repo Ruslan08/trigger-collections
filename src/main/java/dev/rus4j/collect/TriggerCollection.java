@@ -6,6 +6,7 @@ import java.lang.reflect.Proxy;
 import java.util.Collection;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 public class TriggerCollection implements InvocationHandler {
     private static TriggerCollectionBuilder builder;
@@ -94,7 +95,7 @@ public class TriggerCollection implements InvocationHandler {
          * @return builder
          */
         public T beforeAdd(Consumer<E> beforeAdd) {
-            this.beforeAdd = beforeAdd;
+            TriggerCollection.builder.beforeAdd = beforeAdd;
             return self();
         }
 
