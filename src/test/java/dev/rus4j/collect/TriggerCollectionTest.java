@@ -8,6 +8,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -117,5 +118,19 @@ public class TriggerCollectionTest {
 
         collection.addAll(LIST_TO_ADD);
         collection.removeAll(LIST_TO_REMOVE);
+    }
+
+    @Test
+    public void testAllowAdd() {
+        Predicate<Integer> predicate = integer -> integer <= 5;
+
+        final Collection<Integer> collection = TriggerCollection.from(this.collection)
+            .allowAdd(predicate)
+            .build();
+
+        collection.add(5);
+        collection.add(6);
+
+        assertEquals(1, collection.size());
     }
 }

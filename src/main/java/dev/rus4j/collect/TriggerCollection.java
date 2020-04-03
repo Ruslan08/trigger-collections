@@ -35,24 +35,32 @@ public class TriggerCollection implements InvocationHandler {
     @SuppressWarnings("unchecked")
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         if (method.getName().equals("add")) {
+            final boolean allowed = builder.allowAdd.test(args[0]);
+            if (!allowed) return false;
             builder.beforeAdd.accept(args[0]);
             final Object result = method.invoke(builder.backedCollection, args);
             builder.afterAdd.accept(args[0], result);
             return result;
         }
         if (method.getName().equals("remove")) {
+            final boolean allowed = builder.allowRemove.test(args[0]);
+            if (!allowed) return false;
             builder.beforeRemove.accept(args[0]);
             final Object result = method.invoke(builder.backedCollection, args);
             builder.afterRemove.accept(args[0], result);
             return result;
         }
         if (method.getName().equals("addAll")) {
+            final boolean allowed = builder.allowAddAll.test(args[0]);
+            if (!allowed) return false;
             builder.beforeAddAll.accept(args[0]);
             final Object result = method.invoke(builder.backedCollection, args);
             builder.afterAddAll.accept(args[0], result);
             return result;
         }
         if (method.getName().equals("removeAll")) {
+            final boolean allowed = builder.allowRemoveAll.test(args[0]);
+            if (!allowed) return false;
             builder.beforeRemoveAll.accept(args[0]);
             final Object result = method.invoke(builder.backedCollection, args);
             builder.afterRemoveAll.accept(args[0], result);
@@ -67,15 +75,19 @@ public class TriggerCollection implements InvocationHandler {
 
         private Consumer<E> beforeAdd = valueToAdd -> {};
         private BiConsumer<E, Boolean> afterAdd = (valueToAdd, result) -> {};
+        private Predicate<E> allowAdd = valueToAdd -> true;
 
         private Consumer<Collection<E>> beforeAddAll = valueToAdd -> {};
         private BiConsumer<Collection<E>, Boolean> afterAddAll = (valueToAdd, result) -> {};
+        private Predicate<Collection<E>> allowAddAll = valueToAdd -> true;
 
         private Consumer<E> beforeRemove = valueToRemove -> {};
         private BiConsumer<E, Boolean> afterRemove = (valueToRemove, result) -> {};
+        private Predicate<E> allowRemove = valueToRemove -> true;
 
         private Consumer<Collection<E>> beforeRemoveAll = valueToRemove -> {};
         private BiConsumer<Collection<E>, Boolean> afterRemoveAll = (valueToRemove, result) -> {};
+        private Predicate<Collection<E>> allowRemoveAll = valueToRemove -> true;
 
         TriggerCollectionBuilder(Collection<E> backedCollection) {
             if (builder == null) {
@@ -110,6 +122,16 @@ public class TriggerCollection implements InvocationHandler {
         }
 
         /**
+         * Element will be added to collection if it matches the predicate.
+         * @param allowAdd predicate
+         * @return builder
+         */
+        public T allowAdd(Predicate<E> allowAdd) {
+            this.allowAdd = allowAdd;
+            return self();
+        }
+
+        /**
          * Adds action that will be executed before {@link Collection#addAll(Collection)} method is called.
          * @param beforeAddAll action with collection of elements to be added as a parameter
          * @return builder
@@ -126,6 +148,16 @@ public class TriggerCollection implements InvocationHandler {
          */
         public T afterAddAll(BiConsumer<Collection<E>, Boolean> afterAddAll) {
             this.afterAddAll = afterAddAll;
+            return self();
+        }
+
+        /**
+         * Elements will be added to collection if it matches the predicate.
+         * @param allowAddAll predicate
+         * @return builder
+         */
+        public T allowAddAll(Predicate<Collection<E>> allowAddAll) {
+            this.allowAddAll = allowAddAll;
             return self();
         }
 
@@ -149,6 +181,15 @@ public class TriggerCollection implements InvocationHandler {
             return self();
         }
 
+        /**
+         * Element will be removed from collection if it matches the predicate.
+         * @param allowRemove predicate
+         * @return builder
+         */
+        public T allowRemove(Predicate<E> allowRemove) {
+            this.allowRemove = allowRemove;
+            return self();
+        }
 
         /**
          * Adds action that will be executed before {@link Collection#removeAll(Collection)} method is called.
@@ -167,6 +208,16 @@ public class TriggerCollection implements InvocationHandler {
          */
         public T afterRemoveAll(BiConsumer<Collection<E>, Boolean> afterRemoveAll) {
             this.afterRemoveAll = afterRemoveAll;
+            return self();
+        }
+
+        /**
+         * Elements will be removed from collection if it matches the predicate.
+         * @param allowRemoveAll predicate
+         * @return builder
+         */
+        public T allowRemoveAll(Predicate<Collection<E>> allowRemoveAll) {
+            this.allowRemoveAll = allowRemoveAll;
             return self();
         }
 
