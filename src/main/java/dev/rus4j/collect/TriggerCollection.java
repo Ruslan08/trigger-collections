@@ -77,17 +77,17 @@ public class TriggerCollection implements InvocationHandler {
         private BiConsumer<E, Boolean> afterAdd = (valueToAdd, result) -> {};
         private Predicate<E> allowAdd = valueToAdd -> true;
 
-        private Consumer<Collection<E>> beforeAddAll = valueToAdd -> {};
-        private BiConsumer<Collection<E>, Boolean> afterAddAll = (valueToAdd, result) -> {};
-        private Predicate<Collection<E>> allowAddAll = valueToAdd -> true;
+        private Consumer<? extends Collection<E>> beforeAddAll = valueToAdd -> {};
+        private BiConsumer<? extends Collection<E>, Boolean> afterAddAll = (valueToAdd, result) -> {};
+        private Predicate<? extends Collection<E>> allowAddAll = valueToAdd -> true;
 
         private Consumer<E> beforeRemove = valueToRemove -> {};
         private BiConsumer<E, Boolean> afterRemove = (valueToRemove, result) -> {};
         private Predicate<E> allowRemove = valueToRemove -> true;
 
-        private Consumer<Collection<E>> beforeRemoveAll = valueToRemove -> {};
-        private BiConsumer<Collection<E>, Boolean> afterRemoveAll = (valueToRemove, result) -> {};
-        private Predicate<Collection<E>> allowRemoveAll = valueToRemove -> true;
+        private Consumer<? extends Collection<E>> beforeRemoveAll = valueToRemove -> {};
+        private BiConsumer<? extends Collection<E>, Boolean> afterRemoveAll = (valueToRemove, result) -> {};
+        private Predicate<? extends Collection<E>> allowRemoveAll = valueToRemove -> true;
 
         TriggerCollectionBuilder(Collection<E> backedCollection) {
             if (builder == null) {
@@ -136,7 +136,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeAddAll action with collection of elements to be added as a parameter
          * @return builder
          */
-        public T beforeAddAll(Consumer<Collection<E>> beforeAddAll) {
+        public T beforeAddAll(Consumer<? extends Collection<E>> beforeAddAll) {
             this.beforeAddAll = beforeAddAll;
             return self();
         }
@@ -146,7 +146,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterAddAll action with collection of elements to be added and result as parameters
          * @return builder
          */
-        public T afterAddAll(BiConsumer<Collection<E>, Boolean> afterAddAll) {
+        public T afterAddAll(BiConsumer<? extends Collection<E>, Boolean> afterAddAll) {
             this.afterAddAll = afterAddAll;
             return self();
         }
@@ -156,7 +156,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param allowAddAll predicate
          * @return builder
          */
-        public T allowAddAll(Predicate<Collection<E>> allowAddAll) {
+        public T allowAddAll(Predicate<? extends Collection<E>> allowAddAll) {
             this.allowAddAll = allowAddAll;
             return self();
         }
@@ -196,7 +196,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param beforeRemoveAll action with collection of elements to be removed as a parameter
          * @return builder
          */
-        public T beforeRemoveAll(Consumer<Collection<E>> beforeRemoveAll) {
+        public T beforeRemoveAll(Consumer<? extends Collection<E>> beforeRemoveAll) {
             this.beforeRemoveAll = beforeRemoveAll;
             return self();
         }
@@ -206,7 +206,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param afterRemoveAll action with collection of elements to be removed and result as parameters
          * @return builder
          */
-        public T afterRemoveAll(BiConsumer<Collection<E>, Boolean> afterRemoveAll) {
+        public T afterRemoveAll(BiConsumer<? extends Collection<E>, Boolean> afterRemoveAll) {
             this.afterRemoveAll = afterRemoveAll;
             return self();
         }
@@ -216,7 +216,7 @@ public class TriggerCollection implements InvocationHandler {
          * @param allowRemoveAll predicate
          * @return builder
          */
-        public T allowRemoveAll(Predicate<Collection<E>> allowRemoveAll) {
+        public T allowRemoveAll(Predicate<? extends Collection<E>> allowRemoveAll) {
             this.allowRemoveAll = allowRemoveAll;
             return self();
         }

@@ -35,6 +35,7 @@ public class TriggerCollectionTest {
             .build();
 
         collection.add(VALUE_TO_ADD);
+        assertEquals(1, collection.size());
     }
 
     @Test
@@ -45,6 +46,7 @@ public class TriggerCollectionTest {
             .build();
 
         collection.add(VALUE_TO_ADD);
+        assertEquals(1, collection.size());
     }
 
     @Test
@@ -55,6 +57,7 @@ public class TriggerCollectionTest {
             .build();
 
         collection.addAll(LIST_TO_ADD);
+        assertEquals(3, collection.size());
     }
 
     @Test
@@ -68,6 +71,7 @@ public class TriggerCollectionTest {
             .build();
 
         collection.addAll(LIST_TO_ADD);
+        assertEquals(3, collection.size());
     }
 
     @Test
@@ -79,6 +83,7 @@ public class TriggerCollectionTest {
 
         collection.add(VALUE_TO_ADD);
         collection.remove(VALUE_TO_ADD);
+        assertEquals(0, collection.size());
     }
 
     @Test
@@ -93,6 +98,7 @@ public class TriggerCollectionTest {
 
         collection.add(VALUE_TO_ADD);
         collection.remove(VALUE_TO_ADD);
+        assertEquals(0, collection.size());
     }
 
     @Test
@@ -104,6 +110,7 @@ public class TriggerCollectionTest {
 
         collection.addAll(LIST_TO_ADD);
         collection.removeAll(LIST_TO_REMOVE);
+        assertEquals(1, collection.size());
     }
 
     @Test
@@ -118,19 +125,54 @@ public class TriggerCollectionTest {
 
         collection.addAll(LIST_TO_ADD);
         collection.removeAll(LIST_TO_REMOVE);
+        assertEquals(1, collection.size());
     }
 
     @Test
     public void testAllowAdd() {
         Predicate<Integer> predicate = integer -> integer <= 5;
-
         final Collection<Integer> collection = TriggerCollection.from(this.collection)
             .allowAdd(predicate)
             .build();
 
         collection.add(5);
         collection.add(6);
-
         assertEquals(1, collection.size());
+    }
+
+    @Test
+    public void testAllowAllAll() {
+        Predicate<List<Integer>> predicate = list -> list.stream().allMatch(i -> i < 5);
+        final Collection<Integer> collection = TriggerCollection.from(this.collection)
+            .allowAddAll(predicate)
+            .build();
+
+        collection.addAll(List.of(1, 2, 3, 4, 5));
+        assertEquals(0, collection.size());
+    }
+
+    @Test
+    public void testAllowRemove() {
+        Predicate<Integer> predicate = integer -> integer <= 5;
+        final Collection<Integer> collection = TriggerCollection.from(this.collection)
+            .allowRemove(predicate)
+            .build();
+
+        collection.addAll(List.of(1, 2, 3, 4, 5, 6));
+        collection.remove(1);
+        collection.remove(6);
+        assertEquals(5, collection.size());
+    }
+
+    @Test
+    public void testAllowRemoveAll() {
+        Predicate<List<Integer>> predicate = list -> list.stream().allMatch(i -> i < 5);
+        final Collection<Integer> collection = TriggerCollection.from(this.collection)
+            .allowRemoveAll(predicate)
+            .build();
+
+        collection.addAll(List.of(1, 2, 3, 4, 5, 6, 7));
+        collection.removeAll(List.of(1, 3, 5, 7));
+        assertEquals(7, collection.size());
     }
 }
