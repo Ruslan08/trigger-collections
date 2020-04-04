@@ -5,12 +5,10 @@ import org.junit.Test;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.function.BiConsumer;
 import java.util.function.Consumer;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
 
 public class TriggerListTest {
     private static final int VALUE_TO_GET = 7;
@@ -52,15 +50,21 @@ public class TriggerListTest {
 
     @Test
     public void testMethodFromCollection() {
-        AtomicBoolean invoked = new AtomicBoolean(false);
-        final Consumer<Integer> integerConsumer = newValue -> {
-            invoked.set(true);
-            assertEquals(Integer.valueOf(15), newValue);
-        };
+        final Consumer<Integer> before = System.out::println;
+        Consumer<List<Integer>> beforeAll = System.out::println;
+        BiConsumer<Integer, Boolean> after = (i, b) -> System.out.printf("%d, %s", i, b);
+        BiConsumer<List<Integer>, Boolean> afterAll = (list, b) -> System.out.printf("%d, %s", list.size(), b);
+
         List<Integer> triggerList = TriggerList.from(this.list)
-            .beforeAdd(integerConsumer)
+            .beforeAdd(before)
+            .beforeAddAll(beforeAll)
+            .beforeRemove(before)
+            .beforeRemoveAll(beforeAll)
+            .afterAdd(after)
+            .afterAddAll(afterAll)
+            .afterRemove(after)
+            .afterRemoveAll(afterAll)
             .build();
         triggerList.add(15);
-        assertTrue(invoked.get());
     }
 }
