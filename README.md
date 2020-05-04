@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.com/Ruslan08/trigger-collections.svg?branch=master)](https://travis-ci.com/Ruslan08/trigger-collections)
+[![Build Status](https://travis-ci.com/rus4j/trigger-collections.svg?branch=master)](https://travis-ci.com/rus4j/trigger-collections)
 [![codecov](https://codecov.io/gh/Ruslan08/trigger-collections/branch/master/graph/badge.svg)](https://codecov.io/gh/Ruslan08/trigger-collections)
 
 Wrapper for some of standard Java collections with ability to add triggers that fire when the collection is modified. Each wrapper is called as `Trigger` + Java collection name. For example: `TriggerCollection`, `TriggerList`. Each trigger has 3 types of callbacks `before`, `after` and `allow`, and can be fired for all standard collection methods. Like `before` + standard method name. For now the following operations are supported:
